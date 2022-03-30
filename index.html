@@ -39,6 +39,16 @@ h1 {
   text-shadow: 5px 5px #000000;
 }
 
+table {
+  table-layout: fixed ;
+  width: 100% ;
+}
+td {
+  width: 25% ;
+  vertical-align: top;
+  padding: 0 1.5%;
+}
+
 </style>
 </head>
 <body>
@@ -49,8 +59,12 @@ h1 {
     <a href="#home" class="w3-bar-item w3-button w3-wide">COMMENTATOR</a>
     <!-- Right-sided navbar links -->
     <div class="w3-right w3-hide-small">
+
       <a href="#about" class="w3-bar-item w3-button"><i class="fa fa-desktop"></i> ABOUT</a>
+      <a href="#milestones" class="w3-bar-item w3-button"><i class="fa fa-flag"></i> MILESTONES</a>
+      <a href="https://github.com/rospuye/PI21-22_ComentadorFutebol" target="_blank" class="w3-bar-item w3-button"><i class="fa fa-github"></i> CODE REPOSITORY</a>
       <a href="#team" class="w3-bar-item w3-button"><i class="fa fa-user"></i> TEAM</a>
+
       <!-- <a href="#work" class="w3-bar-item w3-button"><i class="fa fa-th"></i> WORK</a>
       <a href="#pricing" class="w3-bar-item w3-button"><i class="fa fa-usd"></i> PRICING</a>
       <a href="#contact" class="w3-bar-item w3-button"><i class="fa fa-envelope"></i> CONTACT</a> -->
@@ -67,6 +81,7 @@ h1 {
 <nav class="w3-sidebar w3-bar-block w3-black w3-card w3-animate-left w3-hide-medium w3-hide-large" style="display:none" id="mySidebar">
   <a href="javascript:void(0)" onclick="w3_close()" class="w3-bar-item w3-button w3-large w3-padding-16">Close ×</a>
   <a href="#about" onclick="w3_close()" class="w3-bar-item w3-button">ABOUT</a>
+  <a href="#milestones" onclick="w3_close()" class="w3-bar-item w3-button">MILESTONES</a>
   <a href="#team" onclick="w3_close()" class="w3-bar-item w3-button">TEAM</a>
   <!-- <a href="#work" onclick="w3_close()" class="w3-bar-item w3-button">WORK</a>
   <a href="#pricing" onclick="w3_close()" class="w3-bar-item w3-button">PRICING</a>
@@ -96,6 +111,59 @@ h1 {
   <div style="display: flex; justify-content: center;"><i class="fa fa-desktop w3-margin-bottom w3-jumbo w3-center"></i></div>
   <h3 class="w3-center">ABOUT THE PROJECT</h3>
   <p class="w3-center w3-large" style="width: 60%; margin: auto;">The goal of this project is the development of an automatic system for natural language commentary of robotic (or human) football games. Using this low level information (such as player and ball positions), which is available through Simulation League and can be sourced from footage by the Medium-Sized Robot League or from human football footage, the system must generate higher level information, recognizing ball passes, penalty kicks, play opportunities, counter-attacks and other football events, as well as analyse the general state of the game by estimating ball possession, team formations, preferencial attack/defence zones, success rates, territorial domain, among others. This information must be used to generate an interesting and appealing commentary in real time and using natural language. The commentary to be generated might eventually be parameterizable, for example, in terms of emotion or commentary partiality.</p>
+</div>
+
+<!-- Milestones Section -->
+<div class="w3-container" style="padding:128px 16px" id="milestones">
+  <div style="display: flex; justify-content: center;"><i class="fa fa-flag w3-margin-bottom w3-jumbo w3-center"></i></div>
+  <h3 class="w3-center">MILESTONES</h3>
+
+  <div style="display: flex; justify-content: center;">
+    <table style="width:100%; margin-top: 5%; margin-inline: 5%;">
+      <thead>
+        <tr>
+          <td style="text-align:center"><b>Milestone 1</b></td>
+          <td style="text-align:center"><b>Milestone 2</b></td>
+          <td style="text-align:center"><b>Milestone 3</b></td>
+          <td style="text-align:center"><b>Milestone 4</b></td>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>
+            <p style="text-align:center"><b>Presentation of the life cycle objectives and calendar for the project.</b></p>
+            <br>In this first milestone, we attempted to define the context in which
+            our project inserts itself, as well as the problem we wanted to solve
+            with its implementation. We thought about what our goals should be and
+            what were the expected results of our efforts.
+            <br>Furthermore, we set out a realistic schedule for the project, dividing
+            it up into two modules: one for the basic functionality of the automatic
+            commentator, and one for its voice, emotion and bias elements. We proceeded,
+            then, to establish the various milestones and deliverables we intended to
+            have ready by then, as well as the numerous tasks that compose our project.
+            <br>We ended this phase by pointing to a few ideas that could be interesting
+            to implement in a future opportunity, along with a few links to related work
+            we found in the process of researching the project and, finally, a few ways 
+            to get in touch with us and access our code.
+            <br><br><a href="docs/milestone1.pdf" target="_blank"><i class="fa fa-paperclip w3-hover-opacity fa-2x"></i> presentation slides</a>            
+          </td>
+          <td>
+            <p style="text-align:center"><b>Presentation of the lifecycle architecture.</b></p>
+            <br><p style="text-align:center"><i class="fa fa-spinner fa-2x"></i> &nbsp;&nbsp;Work in progress.</p>
+          </td>
+          <td>
+            <p style="text-align:center"><b>Prototype.</b></p>
+            <br><p style="text-align:center"><i class="fa fa-code fa-2x"></i> &nbsp;&nbsp;Future work.</p>
+          </td>
+          <td>
+            <p style="text-align:center"><b>Project presentation.</b></p>
+            <br><p style="text-align:center"><i class="fa fa-code fa-2x"></i> &nbsp;&nbsp;Future work.</p>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
 </div>
 
 <!-- Team Section -->
@@ -161,7 +229,7 @@ h1 {
       </div>
       <div class="w3-col l3 m6 w3-margin-bottom">
         <div class="w3-card">
-          <img src="./img/team/noface.png" alt="Dan" style="width:100%">
+          <img src="./img/team/prof_nuno_lau.jpg" alt="Dan" style="width:100%">
           <div class="w3-container">
             <h3>Prof. Nuno Lau</h3>
             <p class="w3-opacity">Academic Advisor</p>
@@ -173,7 +241,7 @@ h1 {
       </div>
       <div class="w3-col l3 m6 w3-margin-bottom">
         <div class="w3-card">
-          <img src="./img/team/noface.png" alt="Dan" style="width:100%">
+          <img src="./img/team/prof_antonio_teixeira.png" alt="Dan" style="width:100%">
           <div class="w3-container">
             <h3>Prof. António Teixeira</h3>
             <p class="w3-opacity">Academic Advisor</p>
@@ -194,7 +262,7 @@ h1 {
 <footer class="w3-center w3-black w3-padding-64">
   <a href="#home" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>To the top</a>
   <div class="w3-xlarge w3-section">
-    <a href="https://github.com/rospuye/PI21-22_ComentadorFutebol"><i class="fa fa-github w3-hover-opacity"></i></a>
+    <a href="https://github.com/rospuye/PI21-22_ComentadorFutebol" target="_blank"><i class="fa fa-github w3-hover-opacity"></i></a>
   </div>
 </footer>
  
