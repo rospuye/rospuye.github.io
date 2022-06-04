@@ -17,15 +17,38 @@ const sceneElements = {
 // head spin counter
 let head_spin_counter = 0;
 
-/**
- * DEBUG PANEL
- */
+// emotional state booleans
+let calm_flag = false;
+let friendly_flag = false;
+let aggressive_flag = false;
 
+// debug panel
 const gui = new dat.GUI();
 
+// animation timelines
+let talking_head_movements = gsap.timeline({ repeat: -1, repeatDelay: 0 });
+let talking_arm1_movements = gsap.timeline({ repeat: -1, repeatDelay: 0 });
+let talking_forearm1_movements = gsap.timeline({ repeat: -1, repeatDelay: 0 });
+let talking_arm2_movements = gsap.timeline({ repeat: -1, repeatDelay: 0 });
+let talking_forearm2_movements = gsap.timeline({ repeat: -1, repeatDelay: 0 });
+
+let head_spin_movement = gsap.timeline({ repeat: 0, repeatDelay: 0 });
+
+let antenna1_movement = gsap.timeline({ repeat: -1, repeatDelay: 0 });
+let antenna2_movement = gsap.timeline({ repeat: -1, repeatDelay: 0 });
+let antenna1_light_movement = gsap.timeline({ repeat: -1, repeatDelay: 0 });
+let antenna2_light_movement = gsap.timeline({ repeat: -1, repeatDelay: 0 });
+
+let energetic_light_movement = gsap.timeline({ repeat: -1, repeatDelay: 0 });
+let energetic_light_movement2 = gsap.timeline({ repeat: -1, repeatDelay: 0 });
+
 const parameters = {
-    neutral: () =>
-    {
+
+    // friendliness
+    f_neutral: () => {
+
+        friendly_flag = false;
+        aggressive_flag = false;
 
         head_spin_movement.to(eyebrow1.rotation, { z: 0, duration: 0 });
         head_spin_movement.to(eyebrow2.rotation, { z: 0, duration: 0 });
@@ -38,42 +61,231 @@ const parameters = {
         gsap.to(spotLight.position, { z: 0, duration: 2 });
         gsap.to(spotLight, { intensity: 0.5, duration: 2 });
 
-        sceneElements.sceneGraph.background = new THREE.Color( 0xf0ddaa );
+        sceneElements.sceneGraph.background = new THREE.Color(0xf0ddaa);
+
+        if (!calm_flag) {
+            eye_change("neutral");
+        }
+
+        const aureola = sceneElements.sceneGraph.getObjectByName("aureola");
+        aureola.visible = false;
+
     },
-    upset: () =>
-    {
+    aggressive: () => {
+
+        friendly_flag = false;
+        aggressive_flag = true;
 
         head_spin_movement.to(eyebrow1.rotation, { z: -0.2, duration: 0 });
         head_spin_movement.to(eyebrow2.rotation, { z: 0.2, duration: 0 });
 
         gsap.to(ambientLight, { intensity: 0.8, duration: 2 });
-        // ambientLight.intensity = 0.8;
 
         spotLight.color = new THREE.Color(0xff0000);
         gsap.to(spotLight.position, { x: 0, duration: 2 });
         gsap.to(spotLight.position, { y: 10, duration: 2 });
         gsap.to(spotLight.position, { z: 20, duration: 2 });
         gsap.to(spotLight, { intensity: 0.3, duration: 2 });
-        // spotLight.intensity = 0.3;
 
-        sceneElements.sceneGraph.background = new THREE.Color( 0x000000 );
-    }
+        sceneElements.sceneGraph.background = new THREE.Color(0x000000);
+
+        if (!calm_flag) {
+            eye_change("neutral");
+        }
+
+        const aureola = sceneElements.sceneGraph.getObjectByName("aureola");
+        aureola.visible = false;
+    },
+    friendly: () => {
+
+        friendly_flag = true;
+        aggressive_flag = false;
+
+        head_spin_movement.to(eyebrow1.rotation, { z: 0, duration: 0 });
+        head_spin_movement.to(eyebrow2.rotation, { z: 0, duration: 0 });
+
+        gsap.to(spotLight.position, { x: -5, duration: 2 });
+        gsap.to(spotLight.position, { y: 8, duration: 2 });
+        gsap.to(spotLight.position, { z: 0, duration: 2 });
+
+        gsap.to(ambientLight, { intensity: 0.8, duration: 2 });
+        sceneElements.sceneGraph.background = new THREE.Color(0x8bd991);
+        spotLight.color = new THREE.Color(0xc9b983);
+
+        gsap.to(spotLight, { intensity: 0.9, duration: 2 });
+
+        // calm eyes superimpose themselves to other eye changes
+        if (!calm_flag) {
+            eye_change("friendly");
+        }
+
+        const aureola = sceneElements.sceneGraph.getObjectByName("aureola");
+        aureola.visible = true;
+
+    },
+
+    // calmness
+    c_neutral: () => {
+
+        calm_flag = false;
+
+        const antenna1 = sceneElements.sceneGraph.getObjectByName("antenna1");
+        const antenna2 = sceneElements.sceneGraph.getObjectByName("antenna2");
+
+        const antenna1_light = sceneElements.sceneGraph.getObjectByName("antenna1_light");
+        const antenna2_light = sceneElements.sceneGraph.getObjectByName("antenna2_light");
+
+        antenna1_movement.pause();
+        antenna2_movement.pause();
+        antenna1_light_movement.pause();
+        antenna2_light_movement.pause();
+        antenna1_light.visible = false;
+        antenna2_light.visible = false;
+
+        gsap.to(antenna1.rotation, { x: 0, duration: 0.2 });
+        gsap.to(antenna2.rotation, { x: 0, duration: 0.2 });
+
+        if (friendly_flag) {
+            eye_change("friendly");
+        }
+        else {
+            eye_change("neutral");
+        }
+
+        energetic_light_movement.pause();
+        energetic_light_movement2.pause();
+        gsap.to(spotLight, { intensity: 0.5, duration: 0.2 });
+        gsap.to(spotLight.position, { x: -5, duration: 2 });
+        gsap.to(spotLight.position, { z: 0, duration: 2 });
+
+        // aggressive eyebrows superimpose themselves to energetic eyebrow changes
+        if (!aggressive_flag) {
+            gsap.to(eyebrow1.rotation, { z: 0, duration: 0 });
+            gsap.to(eyebrow2.rotation, { z: 0, duration: 0 });
+            gsap.to(eyebrow1.position, { y: 1.35, duration: 0.5 });
+            gsap.to(eyebrow2.position, { y: 1.35, duration: 0.5 });
+        }
+
+    },
+    energetic: () => {
+
+        calm_flag = false;
+
+        const antenna1 = sceneElements.sceneGraph.getObjectByName("antenna1");
+        const antenna2 = sceneElements.sceneGraph.getObjectByName("antenna2");
+
+        const antenna1_light = sceneElements.sceneGraph.getObjectByName("antenna1_light");
+        const antenna2_light = sceneElements.sceneGraph.getObjectByName("antenna2_light");
+
+        antenna1_movement.to(antenna1.rotation, { x: 0.07, duration: 0.2 });
+        antenna1_movement.to(antenna1.rotation, { x: -0.07, duration: 0.4 });
+        antenna1_movement.to(antenna1.rotation, { x: 0, duration: 0.2 });
+
+        antenna2_movement.to(antenna2.rotation, { x: -0.07, duration: 0.2 });
+        antenna2_movement.to(antenna2.rotation, { x: 0.07, duration: 0.4 });
+        antenna2_movement.to(antenna2.rotation, { x: 0, duration: 0.2 });
+
+        antenna1_light_movement.to(antenna1_light, { intensity: 0, duration: 0.2 });
+        antenna1_light_movement.to(antenna1_light, { intensity: 10, duration: 0.4 });
+        antenna1_light_movement.to(antenna1_light, { intensity: 5, duration: 0.2 });
+
+        antenna2_light_movement.to(antenna2_light, { intensity: 10, duration: 0.2 });
+        antenna2_light_movement.to(antenna2_light, { intensity: 0, duration: 0.4 });
+        antenna2_light_movement.to(antenna2_light, { intensity: 5, duration: 0.2 });
+
+        antenna1_movement.play();
+        antenna2_movement.play();
+        antenna1_light_movement.play();
+        antenna2_light_movement.play();
+
+        antenna1_light.visible = true;
+        antenna2_light.visible = true;
+
+        if (friendly_flag) {
+            eye_change("friendly");
+        }
+        else {
+            eye_change("neutral");
+        }
+
+        energetic_light_movement.to(spotLight, { intensity: 1, duration: 0.4 });
+        energetic_light_movement.to(spotLight, { intensity: 0, duration: 0.8 });
+        energetic_light_movement.to(spotLight, { intensity: 0.5, duration: 0.4 });
+
+        energetic_light_movement2.to(spotLight.position, { x: 5, duration: 2 });
+        energetic_light_movement2.to(spotLight.position, { z: -5, duration: 1 });
+        energetic_light_movement2.to(spotLight.position, { x: -5, duration: 2 });
+        energetic_light_movement2.to(spotLight.position, { z: 5, duration: 2 });
+        energetic_light_movement2.to(spotLight.position, { x: 5, duration: 2 });
+        energetic_light_movement2.to(spotLight.position, { z: 0, duration: 1 });
+        energetic_light_movement2.to(spotLight.position, { x: -5, duration: 2 });
+
+        energetic_light_movement.play();
+        energetic_light_movement2.play();
+
+        // aggressive eyebrows superimpose themselves to energetic eyebrow changes
+        if (!aggressive_flag) {
+            gsap.to(eyebrow1.rotation, { z: 0.2, duration: 0 });
+            gsap.to(eyebrow2.rotation, { z: -0.2, duration: 0 });
+            gsap.to(eyebrow1.position, { y: 1.4, duration: 0.5 });
+            gsap.to(eyebrow2.position, { y: 1.4, duration: 0.5 });
+        }
+
+    },
+    calm: () => {
+
+        calm_flag = true;
+
+        const antenna1 = sceneElements.sceneGraph.getObjectByName("antenna1");
+        const antenna2 = sceneElements.sceneGraph.getObjectByName("antenna2");
+
+        const antenna1_light = sceneElements.sceneGraph.getObjectByName("antenna1_light");
+        const antenna2_light = sceneElements.sceneGraph.getObjectByName("antenna2_light");
+
+        antenna1_movement.pause();
+        antenna2_movement.pause();
+        antenna1_light_movement.pause();
+        antenna2_light_movement.pause();
+        antenna1_light.visible = false;
+        antenna2_light.visible = false;
+
+        gsap.to(antenna1.rotation, { x: 0, duration: 0.2 });
+        gsap.to(antenna2.rotation, { x: 0, duration: 0.2 });
+
+        eye_change("calm");
+
+        energetic_light_movement.pause();
+        energetic_light_movement2.pause();
+        gsap.to(spotLight, { intensity: 0.5, duration: 0.2 });
+        gsap.to(spotLight.position, { x: -5, duration: 2 });
+        gsap.to(spotLight.position, { z: 0, duration: 2 });
+
+        // aggressive eyebrows superimpose themselves to energetic eyebrow changes
+        if (!aggressive_flag) {
+            gsap.to(eyebrow1.rotation, { z: 0, duration: 0 });
+            gsap.to(eyebrow2.rotation, { z: 0, duration: 0 });
+            gsap.to(eyebrow1.position, { y: 1.35, duration: 0.5 });
+            gsap.to(eyebrow2.position, { y: 1.35, duration: 0.5 });
+        }
+
+    },
+
 }
 
-gui.add(parameters, 'neutral')
-gui.add(parameters, 'upset')
+let friendliness = gui.addFolder('Friendliness')
+let calmness = gui.addFolder('Calmness')
+
+friendliness.add(parameters, 'aggressive')
+friendliness.add(parameters, 'f_neutral')
+friendliness.add(parameters, 'friendly')
+
+calmness.add(parameters, 'energetic')
+calmness.add(parameters, 'c_neutral')
+calmness.add(parameters, 'calm')
 
 helper.initEmptyScene(sceneElements); // initialize the empty scene
 load3DObjects(sceneElements.sceneGraph); // add elements within the scene
 requestAnimationFrame(computeFrame); // animate
-
-// animation timelines
-let talking_head_movements = gsap.timeline({ repeat: -1, repeatDelay: 0 });
-let talking_arm1_movements = gsap.timeline({ repeat: -1, repeatDelay: 0 });
-let talking_forearm1_movements = gsap.timeline({ repeat: -1, repeatDelay: 0 });
-let talking_arm2_movements = gsap.timeline({ repeat: -1, repeatDelay: 0 });
-let talking_forearm2_movements = gsap.timeline({ repeat: -1, repeatDelay: 0 });
-let head_spin_movement = gsap.timeline({ repeat: 0, repeatDelay: 0 });
 
 // raycaster for detecting clicks on robot
 const raycaster = new THREE.Raycaster();
@@ -327,31 +539,67 @@ function head_spin(counter) {
     }
     else { // counter == 3
 
-        let alreadyInUpsetState = false;
+        // let alreadyInUpsetState = false;
 
-        if (eyebrow1.rotation.z != -0.2) {
-            head_spin_movement.to(eyebrow1.rotation, { z: -0.2, duration: 0 });
-            head_spin_movement.to(eyebrow2.rotation, { z: 0.2, duration: 0 });
-        }
-        else {
-            alreadyInUpsetState = true;
-        }
+        // if (eyebrow1.rotation.z != -0.2) {
+        //     head_spin_movement.to(eyebrow1.rotation, { z: -0.2, duration: 0 });
+        //     head_spin_movement.to(eyebrow2.rotation, { z: 0.2, duration: 0 });
+        // }
+        // else {
+        //     alreadyInUpsetState = true;
+        // }
 
         head_spin_movement.to(head.position, { y: head.position.y + 0.5, duration: 0.1 });
         head_spin_movement.to(head.rotation, { y: 4 * Math.PI, duration: 1 });
         head_spin_movement.to(head.position, { y: head.position.y, duration: 0.1 });
         head_spin_movement.to(head.position, { y: head.position.y, duration: 1 });
 
-        if (!alreadyInUpsetState) {
-            head_spin_movement.to(eyebrow1.rotation, { z: 0, duration: 0 });
-            head_spin_movement.to(eyebrow2.rotation, { z: 0, duration: 0 });
-        }
+        // if (!alreadyInUpsetState) {
+        //     head_spin_movement.to(eyebrow1.rotation, { z: 0, duration: 0 });
+        //     head_spin_movement.to(eyebrow2.rotation, { z: 0, duration: 0 });
+        // }
 
         neutral_talking(true, true);
         console.log(helper)
     }
 
     head_spin_movement.to(head.rotation, { y: 0, duration: 0 });
+}
+
+// change eyes depending on emotion
+function eye_change(emotion) {
+
+    const neutral_eye1 = sceneElements.sceneGraph.getObjectByName("neutral_eye1");
+    const neutral_eye2 = sceneElements.sceneGraph.getObjectByName("neutral_eye2");
+    const friendly_eye1 = sceneElements.sceneGraph.getObjectByName("friendly_eye1");
+    const friendly_eye2 = sceneElements.sceneGraph.getObjectByName("friendly_eye2");
+    const calm_eye1 = sceneElements.sceneGraph.getObjectByName("calm_eye1");
+    const calm_eye2 = sceneElements.sceneGraph.getObjectByName("calm_eye2");
+
+    // making all eyes invisible
+    neutral_eye1.visible = false;
+    neutral_eye2.visible = false;
+    friendly_eye1.visible = false;
+    friendly_eye2.visible = false;
+    calm_eye1.visible = false;
+    calm_eye2.visible = false;
+
+    // only current emotion's eyes become visible
+    switch (emotion) {
+        case "neutral":
+            neutral_eye1.visible = true;
+            neutral_eye2.visible = true;
+            break;
+        case "friendly":
+            friendly_eye1.visible = true;
+            friendly_eye2.visible = true;
+            break;
+        case "calm":
+            calm_eye1.visible = true;
+            calm_eye2.visible = true;
+            break;
+    }
+
 }
 
 //////////////////////////////////////////////////////////////////
@@ -412,21 +660,63 @@ function load3DObjects(sceneGraph) {
     head4.rotation.x = Math.PI / 2;
     head4.scale.set(1, 0.8, 0.4);
 
+    const aureola_geometry = new THREE.TorusGeometry(10, 1, 16, 100);
+    // const material = new THREE.MeshBasicMaterial({ color: 0xffff00 });
+    const aureola = new THREE.Mesh(aureola_geometry, material_eyes);
+    aureola.scale.set(0.05, 0.05, 0.05);
+    aureola.rotation.x = Math.PI / 2;
+    aureola.position.y = 2.1;
+    aureola.name = "aureola";
+    aureola.visible = false;
+
     // Eyes
 
     const eyes = new THREE.Group();
     eyes.name = "eyes";
 
+    // neutral eyes
     const eye_geometry = new THREE.CylinderGeometry(0.3, 0.3, 0.2, 32);
     const eye1 = new THREE.Mesh(eye_geometry, material_eyes);
     eye1.position.set(-0.25, 1, 0.61);
     eye1.rotation.x = Math.PI / 2;
     eye1.scale.set(0.5, 1, 0.8);
+    eye1.name = "neutral_eye1";
+    // eye1.visible = false;
 
     const eye2 = new THREE.Mesh(eye_geometry, material_eyes);
     eye2.position.set(0.25, 1, 0.61);
     eye2.rotation.x = Math.PI / 2;
     eye2.scale.set(0.5, 1, 0.8);
+    eye2.name = "neutral_eye2";
+    // eye2.visible = false;
+
+    // friendly eyes
+    const friendly_eye_geometry = new THREE.RingGeometry(3, 5, 32, 1, 0, Math.PI);
+    const friendly_eye1 = new THREE.Mesh(friendly_eye_geometry, material_eyes);
+    friendly_eye1.position.set(-0.25, 1, 0.65);
+    friendly_eye1.scale.set(0.04, 0.04, 0.04);
+    friendly_eye1.name = "friendly_eye1";
+    friendly_eye1.visible = false;
+
+    const friendly_eye2 = new THREE.Mesh(friendly_eye_geometry, material_eyes);
+    friendly_eye2.position.set(0.25, 1, 0.65);
+    friendly_eye2.scale.set(0.04, 0.04, 0.04);
+    friendly_eye2.name = "friendly_eye2";
+    friendly_eye2.visible = false;
+
+    // calm eyes
+    const calm_eye_geometry = new THREE.RingGeometry(3, 5, 32, 1, Math.PI, Math.PI);
+    const calm_eye1 = new THREE.Mesh(calm_eye_geometry, material_eyes);
+    calm_eye1.position.set(-0.25, 1, 0.65);
+    calm_eye1.scale.set(0.04, 0.04, 0.04);
+    calm_eye1.name = "calm_eye1";
+    calm_eye1.visible = false;
+
+    const calm_eye2 = new THREE.Mesh(calm_eye_geometry, material_eyes);
+    calm_eye2.position.set(0.25, 1, 0.65);
+    calm_eye2.scale.set(0.04, 0.04, 0.04);
+    calm_eye2.name = "calm_eye2";
+    calm_eye2.visible = false;
 
     const eyebrow_geometry = new THREE.BoxGeometry(0.3, 0.07, 0.2);
     const eyebrow1 = new THREE.Mesh(eyebrow_geometry, material_head1);
@@ -437,7 +727,7 @@ function load3DObjects(sceneGraph) {
     eyebrow2.position.set(0.25, 1.35, 0.61);
     eyebrow2.name = "eyebrow2";
 
-    eyes.add(eye1, eye2);
+    eyes.add(eye1, eye2, friendly_eye1, friendly_eye2, calm_eye1, calm_eye2);
     eyes.add(eyebrow1, eyebrow2);
 
     // Antennas
@@ -460,21 +750,32 @@ function load3DObjects(sceneGraph) {
     const antenna_point1 = new THREE.Mesh(antenna_point_geometry, material_head1);
     antenna_point1.position.set(-0.85, 1.8, 0);
 
+    const antenna1_light = new THREE.PointLight(0xff0000, 5, 0.5);
+    antenna1_light.position.set(-0.85, 1.6, 0);
+    antenna1_light.name = "antenna1_light";
+    antenna1_light.visible = false;
+
     const antenna1 = new THREE.Group();
     antenna1.name = "antenna1";
-    antenna1.add(antenna_stick1, antenna_point1);
+    antenna1.add(antenna_stick1, antenna_point1, antenna1_light);
 
     const antenna_stick2 = new THREE.Mesh(antenna_stick_geometry, material_head1);
     antenna_stick2.position.set(0.85, 1.6, 0);
     const antenna_point2 = new THREE.Mesh(antenna_point_geometry, material_head1);
     antenna_point2.position.set(0.85, 1.8, 0);
 
+    const antenna2_light = new THREE.PointLight(0xff0000, 5, 0.5);
+    antenna2_light.position.set(0.85, 1.8, 0);
+    antenna2_light.name = "antenna2_light";
+    antenna2_light.visible = false;
+
+
     const antenna2 = new THREE.Group();
     antenna2.name = "antenna2";
-    antenna2.add(antenna_stick2, antenna_point2);
+    antenna2.add(antenna_stick2, antenna_point2, antenna2_light);
     antennas.add(antenna1, antenna2);
 
-    head.add(head1, head2, head3, head4);
+    head.add(head1, head2, head3, head4, aureola);
     head.add(eyes);
     head.add(antennas);
     head.position.y = 2.7;
