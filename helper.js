@@ -13,7 +13,6 @@ const helper = {
         sceneElements.sceneGraph = new THREE.Scene();
         sceneElements.sceneGraph.background = new THREE.Color( 0xf0ddaa );
 
-
         // ************************** //
         // Add camera
         // ************************** //
@@ -44,7 +43,7 @@ const helper = {
         // Add spotlight (with shadows)
         // ***************************** //
         spotLight = new THREE.SpotLight('rgb(255, 255, 255)', 0.5);
-        spotLight.position.set(-5, 8, 0);
+        spotLight.position.set(-25, 8, 0);
         sceneElements.sceneGraph.add(spotLight);
 
         // Setup shadow properties for the spotlight

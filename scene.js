@@ -25,6 +25,24 @@ let aggressive_flag = false;
 // debug panel
 const gui = new dat.GUI();
 
+// loaders
+const gltfLoader = new THREE.GLTFLoader()
+const loadingManager = new THREE.LoadingManager()
+const textureLoader = new THREE.TextureLoader(loadingManager)
+
+// textures
+const water_texture = textureLoader.load('/textures/water.jpg')
+const grass_texture = textureLoader.load('/textures/grass.jpg')
+grass_texture.repeat.x = 5
+grass_texture.repeat.y = 5
+grass_texture.wrapS = THREE.RepeatWrapping
+grass_texture.wrapT = THREE.RepeatWrapping
+const tiles_texture = textureLoader.load('/textures/tiles.jpg')
+tiles_texture.repeat.x = 2
+tiles_texture.repeat.y = 2
+tiles_texture.wrapS = THREE.RepeatWrapping
+tiles_texture.wrapT = THREE.RepeatWrapping
+
 // animation timelines
 let talking_head_movements = gsap.timeline({ repeat: -1, repeatDelay: 0 });
 let talking_arm1_movements = gsap.timeline({ repeat: -1, repeatDelay: 0 });
@@ -42,6 +60,21 @@ let antenna2_light_movement = gsap.timeline({ repeat: -1, repeatDelay: 0 });
 let energetic_light_movement = gsap.timeline({ repeat: -1, repeatDelay: 0 });
 let energetic_light_movement2 = gsap.timeline({ repeat: -1, repeatDelay: 0 });
 
+let wave_head = gsap.timeline({ repeat: 0, repeatDelay: 0 });
+let wave_arm = gsap.timeline({
+    repeat: 0,
+    repeatDelay: 0,
+    onComplete: function () {
+        if (!friendly_flag) {
+            eye_change("neutral");
+        }
+        neutral_talking(true, false);
+    },
+});
+let wave_arm2 = gsap.timeline({ repeat: 0, repeatDelay: 0 });
+
+let duck_movement = gsap.timeline({ repeat: -1, repeatDelay: 0 });
+
 const parameters = {
 
     // friendliness
@@ -56,7 +89,7 @@ const parameters = {
         gsap.to(ambientLight, { intensity: 0.6, duration: 2 });
 
         spotLight.color = new THREE.Color(0xffffff);
-        gsap.to(spotLight.position, { x: -5, duration: 2 });
+        gsap.to(spotLight.position, { x: -25, duration: 2 });
         gsap.to(spotLight.position, { y: 8, duration: 2 });
         gsap.to(spotLight.position, { z: 0, duration: 2 });
         gsap.to(spotLight, { intensity: 0.5, duration: 2 });
@@ -104,7 +137,7 @@ const parameters = {
         head_spin_movement.to(eyebrow1.rotation, { z: 0, duration: 0 });
         head_spin_movement.to(eyebrow2.rotation, { z: 0, duration: 0 });
 
-        gsap.to(spotLight.position, { x: -5, duration: 2 });
+        gsap.to(spotLight.position, { x: -25, duration: 2 });
         gsap.to(spotLight.position, { y: 8, duration: 2 });
         gsap.to(spotLight.position, { z: 0, duration: 2 });
 
@@ -155,7 +188,7 @@ const parameters = {
         energetic_light_movement.pause();
         energetic_light_movement2.pause();
         gsap.to(spotLight, { intensity: 0.5, duration: 0.2 });
-        gsap.to(spotLight.position, { x: -5, duration: 2 });
+        gsap.to(spotLight.position, { x: -25, duration: 2 });
         gsap.to(spotLight.position, { z: 0, duration: 2 });
 
         // aggressive eyebrows superimpose themselves to energetic eyebrow changes
@@ -257,7 +290,7 @@ const parameters = {
         energetic_light_movement.pause();
         energetic_light_movement2.pause();
         gsap.to(spotLight, { intensity: 0.5, duration: 0.2 });
-        gsap.to(spotLight.position, { x: -5, duration: 2 });
+        gsap.to(spotLight.position, { x: -25, duration: 2 });
         gsap.to(spotLight.position, { z: 0, duration: 2 });
 
         // aggressive eyebrows superimpose themselves to energetic eyebrow changes
@@ -285,6 +318,11 @@ calmness.add(parameters, 'calm')
 
 helper.initEmptyScene(sceneElements); // initialize the empty scene
 load3DObjects(sceneElements.sceneGraph); // add elements within the scene
+
+// // duck animation
+// let duck = sceneElements.sceneGraph.getObjectByName("duck");
+// // duck_movement.to(duck.position, { x: 5, duration: 5 });
+
 requestAnimationFrame(computeFrame); // animate
 
 // raycaster for detecting clicks on robot
@@ -373,8 +411,8 @@ function onDocumentKeyPress(event) {
     const shoulder2Joint = sceneElements.sceneGraph.getObjectByName("shoulder2Joint");
     const elbow2Joint = sceneElements.sceneGraph.getObjectByName("elbow2Joint");
 
-    // stop talking first (for walking in any direction)
-    if (event.keyCode == 100 || event.keyCode == 115 || event.keyCode == 97 || event.keyCode == 119) {
+    // stop talking first (for walking in any direction or waving)
+    if (event.keyCode == 100 || event.keyCode == 115 || event.keyCode == 97 || event.keyCode == 119 || event.keyCode == 32) {
         neutral_talking(false, false);
         gsap.to(head.rotation, { x: 0, duration: 0.3 });
         gsap.to(head.rotation, { z: 0, duration: 0.3 });
@@ -423,6 +461,40 @@ function onDocumentKeyPress(event) {
             gsap.to(torso3.rotation, { x: 0.03, duration: 0.3 });
             gsap.to(head.rotation, { y: Math.PI, duration: 0.3 });
             gsap.to(arms.rotation, { y: Math.PI, duration: 0.3 });
+
+            break;
+
+        case 32: //h (wave)
+            eye_change("friendly");
+
+            wave_head.to(head.rotation, { z: 0.2, duration: 0.5 });
+            wave_head.to(head.rotation, { z: 0.2, duration: 7 });
+            wave_head.to(head.rotation, { z: 0, duration: 0.5 });
+
+            wave_arm.to(shoulder1Joint.rotation, { x: -1.5, duration: 1 });
+            wave_arm.to(shoulder1Joint.rotation, { x: -1.5, duration: 9.5 });
+            wave_arm.to(shoulder1Joint.rotation, { x: 0, duration: 1 });
+
+            wave_arm2.to(elbow1Joint.rotation, { x: -1.5, duration: 1 });
+            wave_arm2.to(elbow1Joint.rotation, { z: -0.5, duration: 0.25 });
+            wave_arm2.to(elbow1Joint.rotation, { z: 0.5, duration: 0.5 });
+            wave_arm2.to(elbow1Joint.rotation, { z: -0.5, duration: 0.5 });
+            wave_arm2.to(elbow1Joint.rotation, { z: 0.5, duration: 0.5 });
+            wave_arm2.to(elbow1Joint.rotation, { z: -0.5, duration: 0.5 });
+            wave_arm2.to(elbow1Joint.rotation, { z: 0.5, duration: 0.5 });
+            wave_arm2.to(elbow1Joint.rotation, { z: -0.5, duration: 0.5 });
+            wave_arm2.to(elbow1Joint.rotation, { z: 0.5, duration: 0.5 });
+            wave_arm2.to(elbow1Joint.rotation, { z: -0.5, duration: 0.5 });
+            wave_arm2.to(elbow1Joint.rotation, { z: 0.5, duration: 0.5 });
+            wave_arm2.to(elbow1Joint.rotation, { z: -0.5, duration: 0.5 });
+            wave_arm2.to(elbow1Joint.rotation, { z: 0.5, duration: 0.5 });
+            wave_arm2.to(elbow1Joint.rotation, { z: -0.5, duration: 0.5 });
+            wave_arm2.to(elbow1Joint.rotation, { z: 0.5, duration: 0.5 });
+            wave_arm2.to(elbow1Joint.rotation, { z: -0.5, duration: 0.5 });
+            wave_arm2.to(elbow1Joint.rotation, { z: 0.5, duration: 0.5 });
+            wave_arm2.to(elbow1Joint.rotation, { z: -0.5, duration: 0.5 });
+            wave_arm2.to(elbow1Joint.rotation, { z: 0, duration: 0.25 });
+            wave_arm2.to(elbow1Joint.rotation, { x: 0, duration: 1 });
 
             break;
 
@@ -482,7 +554,7 @@ function neutral_talking(play, headspin) {
         talking_arm2_movements.to(shoulder2Joint.rotation, { x: 0, duration: rand_duration2 });
     }
 
-    // upper arm: x = -0.5 to 0
+    // lower arm: x = -0.5 to 0
     for (let i = 0; i < 3; i++) {
         talking_forearm1_movements.to(elbow1Joint.rotation, { x: 0, duration: gsap.utils.random(0.3, 1, 0.1) });
         talking_forearm1_movements.to(elbow1Joint.rotation, { x: gsap.utils.random(-0.5, 0, 0.1), duration: gsap.utils.random(0.3, 1, 0.1) });
@@ -612,7 +684,7 @@ function load3DObjects(sceneGraph) {
     // Create a ground plane
     // ************************** //
     const planeGeometry = new THREE.PlaneGeometry(15, 15);
-    const planeMaterial = new THREE.MeshPhongMaterial({ color: 0x225e23, side: THREE.DoubleSide });
+    const planeMaterial = new THREE.MeshPhongMaterial({ map: grass_texture, side: THREE.DoubleSide });
     const planeObject = new THREE.Mesh(planeGeometry, planeMaterial);
     sceneGraph.add(planeObject);
 
@@ -620,6 +692,36 @@ function load3DObjects(sceneGraph) {
     planeObject.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
     // Set shadow property
     planeObject.receiveShadow = true;
+
+    const planeMaterial2 = new THREE.MeshPhongMaterial({ map: tiles_texture, side: THREE.DoubleSide });
+    const planeObject2 = new THREE.Mesh(planeGeometry, planeMaterial2);
+    planeObject2.rotateOnAxis(new THREE.Vector3(1, 0, 0), Math.PI / 2);
+    planeObject2.position.x = -15
+    sceneGraph.add(planeObject2);
+
+    // ************************** //
+    // Create the lake
+    // ************************** //
+
+    const lake_geometry = new THREE.CircleGeometry(3, 64);
+    const lake_material = new THREE.MeshPhongMaterial({ map: water_texture });
+    const lake = new THREE.Group();
+
+    const lake1 = new THREE.Mesh(lake_geometry, lake_material);
+    lake1.rotation.x = -Math.PI / 2
+    lake1.position.y = 0.001 // avoid z-fighting
+    lake1.scale.y = 0.8
+    lake1.receiveShadow = true;
+
+    const lake2 = new THREE.Mesh(lake_geometry, lake_material);
+    lake2.rotation.x = -Math.PI / 2
+    lake2.position.set(4, 0.001, 2)
+    lake2.scale.set(0.3, 0.3, 0.3);
+    lake2.receiveShadow = true;
+
+    lake.add(lake1, lake2);
+    lake.position.set(2, 0, 0)
+    sceneGraph.add(lake);
 
     // ************************** //
     // CREATING THE ROBOT
@@ -819,13 +921,11 @@ function load3DObjects(sceneGraph) {
     shoulder1.name = "shoulder1";
     shoulder1.position.set(1.35, 2.7, 0);
     shoulder1.scale.set(1.2, 1.2, 1.2);
-    // sceneGraph.add(shoulder1);
 
     const shoulder2 = new THREE.Mesh(shoulder_geometry, material_ears);
     shoulder2.name = "shoulder2";
     shoulder2.position.set(-1.35, 2.7, 0);
     shoulder2.scale.set(1.2, 1.2, 1.2);
-    // sceneGraph.add(shoulder2);
 
     const arm1 = new THREE.Mesh(arm_part_geometry, material_torso);
     arm1.position.set(0, -0.5, 0);
@@ -876,7 +976,70 @@ function load3DObjects(sceneGraph) {
 
     robot.add(head);
     robot.add(torso);
+    robot.position.x = -4
     sceneGraph.add(robot);
+
+    // MODELS
+
+    // duck model quack quack
+    gltfLoader.load(
+        '/models/Duck/glTF/Duck.gltf',
+        (gltf) => {
+            let duck = gltf.scene.children[0]
+            sceneGraph.add(duck)
+            duck.position.x = 2
+
+            duck_movement.to(duck.position, { x: 3, duration: 1 });
+            duck_movement.to(duck.rotation, { y: 2, duration: 1 });
+            duck_movement.to(duck.rotation, { y: 2, duration: 2 });
+            duck_movement.to(duck.rotation, { y: Math.PI, duration: 2 });
+            duck_movement.to(duck.rotation, { y: Math.PI, duration: 0.5 });
+            duck_movement.to(duck.position, { x: 1, duration: 2.5 });
+
+            duck_movement.to(duck.rotation, { y: Math.PI - 0.1, duration: 0.1 });
+            for (let i = 0; i < 2; i++) {
+                duck_movement.to(duck.rotation, { y: Math.PI + 0.1, duration: 0.2 });
+                duck_movement.to(duck.rotation, { y: Math.PI - 0.1, duration: 0.2 });
+            }
+            duck_movement.to(duck.rotation, { y: Math.PI, duration: 0.1 });
+
+            duck_movement.to(duck.rotation, { y: Math.PI, duration: 1.5 });
+            duck_movement.to(duck.rotation, { y: 0, duration: 2 });
+            duck_movement.to(duck.position, { x: 2, duration: 2 });
+
+        }
+    )
+
+    // couch
+    gltfLoader.load(
+        '/models/GlamVelvetSofa/glTF/GlamVelvetSofa.gltf',
+        (gltf) => {
+            while(gltf.scene.children.length)
+            {
+                let couch_part = gltf.scene.children[0]
+                if ( couch_part.material ) {
+                    couch_part.material.metalness = 0;
+                }
+                couch_part.scale.set(4,4,4)
+                couch_part.position.set(-13,0,-4)
+                sceneGraph.add(couch_part)
+            }
+        }
+    )
+
+    // // house_light
+    // gltfLoader.load(
+    //     '/models/LightsPunctualLamp/glTF/LightsPunctualLamp.gltf',
+    //     (gltf) => {
+    //         while(gltf.scene.children.length)
+    //         {
+    //             let house_light = gltf.scene.children[0]
+    //             house_light.scale.set(4,4,4)
+    //             house_light.position.set(-13,0,-4)
+    //             sceneGraph.add(house_light)
+    //         }
+    //     }
+    // )
 
 }
 
@@ -902,8 +1065,8 @@ const elbow2 = sceneElements.sceneGraph.getObjectByName("elbow2");
 
 const eyebrow1 = sceneElements.sceneGraph.getObjectByName("eyebrow1");
 const eyebrow2 = sceneElements.sceneGraph.getObjectByName("eyebrow2");
-
-// const spotLight = sceneElements.sceneGraph.getObjectByName("spotLight");
+// const duck = sceneElements.sceneGraph.getObjectByName("duck");
+// console.log(duck)
 
 let neutral_position_called = true;
 neutral_talking(true, false);
@@ -927,7 +1090,7 @@ function computeFrame(time) {
     elbow2Joint.position.set(elbow2.position.x, elbow2.position.y, elbow2.position.z);
 
     // walking around
-    if (keyD && robot.position.x < 5) {
+    if (keyD && robot.position.x < -3) {
         robot.translateX(dispX);
         neutral_position_called = false;
     }
@@ -935,7 +1098,7 @@ function computeFrame(time) {
         robot.translateZ(-dispZ);
         neutral_position_called = false;
     }
-    if (keyA && robot.position.x > -5) {
+    if (keyA && robot.position.x > -20) {
         robot.translateX(-dispX);
         neutral_position_called = false;
     }
