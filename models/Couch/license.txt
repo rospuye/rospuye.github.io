@@ -1,0 +1,11 @@
+Model Information:
+* title:	Worn couch
+* source:	https://sketchfab.com/3d-models/worn-couch-b3d0b97ff9994427b4bdbed1989fea98
+* author:	Simon Phan (https://sketchfab.com/sphan)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Worn couch" (https://sketchfab.com/3d-models/worn-couch-b3d0b97ff9994427b4bdbed1989fea98) by Simon Phan (https://sketchfab.com/sphan) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
